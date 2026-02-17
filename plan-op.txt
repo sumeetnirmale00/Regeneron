@@ -1,0 +1,771 @@
+Terraform used the selected providers to generate the following execution plan.
+Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # module.warehouses.snowflake_warehouse.this["ANALYTICS_WH"] will be created
+  + resource "snowflake_warehouse" "this" {
+      + auto_resume                         = true
+      + auto_suspend                        = 300
+      + comment                             = "Warehouse for analyst and BI tool queries"
+      + enable_query_acceleration            = false
+      + fully_qualified_name                 = (known after apply)
+      + id                                  = (known after apply)
+      + max_cluster_count                   = 4
+      + max_concurrency_level               = 8
+      + min_cluster_count                   = 1
+      + name                                = "ANALYTICS_WH"
+      + query_acceleration_max_scale_factor = 8
+      + resource_monitor                    = (known after apply)
+      + scaling_policy                      = "STANDARD"
+      + show_output                         = (known after apply)
+      + warehouse_size                      = "LARGE"
+      + warehouse_type                      = "STANDARD"
+    }
+
+  # module.warehouses.snowflake_warehouse.this["DATA_SCIENCE_WH"] will be created
+  + resource "snowflake_warehouse" "this" {
+      + auto_resume                         = true
+      + auto_suspend                        = 600
+      + comment                             = "Warehouse for data science and ML workloads"
+      + enable_query_acceleration            = false
+      + fully_qualified_name                 = (known after apply)
+      + id                                  = (known after apply)
+      + max_cluster_count                   = 2
+      + max_concurrency_level               = 8
+      + min_cluster_count                   = 1
+      + name                                = "DATA_SCIENCE_WH"
+      + query_acceleration_max_scale_factor = 8
+      + resource_monitor                    = (known after apply)
+      + scaling_policy                      = "STANDARD"
+      + show_output                         = (known after apply)
+      + warehouse_size                      = "XLARGE"
+      + warehouse_type                      = "STANDARD"
+    }
+
+  # module.warehouses.snowflake_warehouse.this["ETL_WH"] will be created
+  + resource "snowflake_warehouse" "this" {
+      + auto_resume                         = true
+      + auto_suspend                        = 120
+      + comment                             = "Warehouse for ETL/ELT data ingestion workloads"
+      + enable_query_acceleration            = false
+      + fully_qualified_name                 = (known after apply)
+      + id                                  = (known after apply)
+      + max_cluster_count                   = 3
+      + max_concurrency_level               = 8
+      + min_cluster_count                   = 1
+      + name                                = "ETL_WH"
+      + query_acceleration_max_scale_factor = 8
+      + resource_monitor                    = (known after apply)
+      + scaling_policy                      = "STANDARD"
+      + show_output                         = (known after apply)
+      + warehouse_size                      = "MEDIUM"
+      + warehouse_type                      = "STANDARD"
+    }
+
+  # module.warehouses.snowflake_warehouse.this["REPORTING_WH"] will be created
+  + resource "snowflake_warehouse" "this" {
+      + auto_resume                         = true
+      + auto_suspend                        = 60
+      + comment                             = "Warehouse for scheduled reporting jobs"
+      + enable_query_acceleration            = false
+      + fully_qualified_name                 = (known after apply)
+      + id                                  = (known after apply)
+      + max_cluster_count                   = 2
+      + max_concurrency_level               = 8
+      + min_cluster_count                   = 1
+      + name                                = "REPORTING_WH"
+      + query_acceleration_max_scale_factor = 8
+      + resource_monitor                    = (known after apply)
+      + scaling_policy                      = "STANDARD"
+      + show_output                         = (known after apply)
+      + warehouse_size                      = "SMALL"
+      + warehouse_type                      = "STANDARD"
+    }
+
+  # module.databases.snowflake_database.this["ANALYTICS_DB"] will be created
+  + resource "snowflake_database" "this" {
+      + comment                     = "Curated analytics and reporting data"
+      + data_retention_time_in_days = 14
+      + fully_qualified_name        = (known after apply)
+      + id                          = (known after apply)
+      + is_transient                = false
+      + name                        = "ANALYTICS_DB"
+      + owner                       = (known after apply)
+      + show_output                 = (known after apply)
+    }
+
+  # module.databases.snowflake_database.this["DATA_SCIENCE_DB"] will be created
+  + resource "snowflake_database" "this" {
+      + comment                     = "Sandbox for data science experiments"
+      + data_retention_time_in_days = 3
+      + fully_qualified_name        = (known after apply)
+      + id                          = (known after apply)
+      + is_transient                = false
+      + name                        = "DATA_SCIENCE_DB"
+      + owner                       = (known after apply)
+      + show_output                 = (known after apply)
+    }
+
+  # module.databases.snowflake_database.this["RAW_DB"] will be created
+  + resource "snowflake_database" "this" {
+      + comment                     = "Landing zone for raw ingested data"
+      + data_retention_time_in_days = 7
+      + fully_qualified_name        = (known after apply)
+      + id                          = (known after apply)
+      + is_transient                = false
+      + name                        = "RAW_DB"
+      + owner                       = (known after apply)
+      + show_output                 = (known after apply)
+    }
+
+  # module.databases.snowflake_schema.this["ANALYTICS_DB.AGGREGATES"] will be created
+  + resource "snowflake_schema" "this" {
+      + comment              = "Pre-computed aggregate tables"
+      + database             = "ANALYTICS_DB"
+      + fully_qualified_name = (known after apply)
+      + id                   = (known after apply)
+      + is_transient         = false
+      + name                 = "AGGREGATES"
+      + owner                = (known after apply)
+      + show_output          = (known after apply)
+    }
+
+  # module.databases.snowflake_schema.this["ANALYTICS_DB.MARTS"] will be created
+  + resource "snowflake_schema" "this" {
+      + comment              = "Business-level data marts"
+      + database             = "ANALYTICS_DB"
+      + fully_qualified_name = (known after apply)
+      + id                   = (known after apply)
+      + is_transient         = false
+      + name                 = "MARTS"
+      + owner                = (known after apply)
+      + show_output          = (known after apply)
+    }
+
+  # module.databases.snowflake_schema.this["ANALYTICS_DB.STAGING"] will be created
+  + resource "snowflake_schema" "this" {
+      + comment              = "Intermediate staging tables"
+      + database             = "ANALYTICS_DB"
+      + fully_qualified_name = (known after apply)
+      + id                   = (known after apply)
+      + is_transient         = false
+      + name                 = "STAGING"
+      + owner                = (known after apply)
+      + show_output          = (known after apply)
+    }
+
+  # module.databases.snowflake_schema.this["DATA_SCIENCE_DB.EXPERIMENTS"] will be created
+  + resource "snowflake_schema" "this" {
+      + comment              = "Experiment tracking data"
+      + database             = "DATA_SCIENCE_DB"
+      + fully_qualified_name = (known after apply)
+      + id                   = (known after apply)
+      + is_transient         = false
+      + name                 = "EXPERIMENTS"
+      + owner                = (known after apply)
+      + show_output          = (known after apply)
+    }
+
+  # module.databases.snowflake_schema.this["DATA_SCIENCE_DB.FEATURES"] will be created
+  + resource "snowflake_schema" "this" {
+      + comment              = "Feature store for ML models"
+      + database             = "DATA_SCIENCE_DB"
+      + fully_qualified_name = (known after apply)
+      + id                   = (known after apply)
+      + is_transient         = false
+      + name                 = "FEATURES"
+      + owner                = (known after apply)
+      + show_output          = (known after apply)
+    }
+
+  # module.databases.snowflake_schema.this["RAW_DB.KAFKA"] will be created
+  + resource "snowflake_schema" "this" {
+      + comment              = "Kafka streaming raw events"
+      + database             = "RAW_DB"
+      + fully_qualified_name = (known after apply)
+      + id                   = (known after apply)
+      + is_transient         = false
+      + name                 = "KAFKA"
+      + owner                = (known after apply)
+      + show_output          = (known after apply)
+    }
+
+  # module.databases.snowflake_schema.this["RAW_DB.SALESFORCE"] will be created
+  + resource "snowflake_schema" "this" {
+      + comment              = "Salesforce CRM raw data"
+      + database             = "RAW_DB"
+      + fully_qualified_name = (known after apply)
+      + id                   = (known after apply)
+      + is_transient         = false
+      + name                 = "SALESFORCE"
+      + owner                = (known after apply)
+      + show_output          = (known after apply)
+    }
+
+  # module.databases.snowflake_schema.this["RAW_DB.SAP"] will be created
+  + resource "snowflake_schema" "this" {
+      + comment              = "SAP ERP raw data"
+      + database             = "RAW_DB"
+      + fully_qualified_name = (known after apply)
+      + id                   = (known after apply)
+      + is_transient         = false
+      + name                 = "SAP"
+      + owner                = (known after apply)
+      + show_output          = (known after apply)
+    }
+
+  # module.roles.snowflake_account_role.this["DATA_ANALYST"] will be created
+  + resource "snowflake_account_role" "this" {
+      + comment              = "Role for business analysts and BI users"
+      + fully_qualified_name = (known after apply)
+      + id                   = (known after apply)
+      + name                 = "DATA_ANALYST"
+      + show_output          = (known after apply)
+    }
+
+  # module.roles.snowflake_account_role.this["DATA_ENGINEER"] will be created
+  + resource "snowflake_account_role" "this" {
+      + comment              = "Role for data engineering team"
+      + fully_qualified_name = (known after apply)
+      + id                   = (known after apply)
+      + name                 = "DATA_ENGINEER"
+      + show_output          = (known after apply)
+    }
+
+  # module.roles.snowflake_account_role.this["DATA_SCIENTIST"] will be created
+  + resource "snowflake_account_role" "this" {
+      + comment              = "Role for data science team"
+      + fully_qualified_name = (known after apply)
+      + id                   = (known after apply)
+      + name                 = "DATA_SCIENTIST"
+      + show_output          = (known after apply)
+    }
+
+  # module.roles.snowflake_account_role.this["ETL_SERVICE_ROLE"] will be created
+  + resource "snowflake_account_role" "this" {
+      + comment              = "Service account role for ETL pipelines"
+      + fully_qualified_name = (known after apply)
+      + id                   = (known after apply)
+      + name                 = "ETL_SERVICE_ROLE"
+      + show_output          = (known after apply)
+    }
+
+  # module.users.snowflake_user.this["ETL_SERVICE_USER"] will be created
+  + resource "snowflake_user" "this" {
+      + comment                             = "Service account for automated ETL pipelines"
+      + default_namespace                   = (known after apply)
+      + default_role                        = "ETL_SERVICE_ROLE"
+      + default_warehouse                   = "ETL_WH"
+      + disabled                            = false
+      + display_name                        = (known after apply)
+      + email                               = "etl-service@regeneron-demo.com"
+      + fully_qualified_name                = (known after apply)
+      + has_rsa_public_key                  = (known after apply)
+      + id                                  = (known after apply)
+      + login_name                          = "etl_svc"
+      + must_change_password                = false
+      + name                                = "ETL_SERVICE_USER"
+      + show_output                         = (known after apply)
+    }
+
+  # module.users.snowflake_user.this["JOHN_SMITH"] will be created
+  + resource "snowflake_user" "this" {
+      + comment                             = "Business analyst – Commercial Analytics"
+      + default_namespace                   = (known after apply)
+      + default_role                        = "DATA_ANALYST"
+      + default_warehouse                   = "ANALYTICS_WH"
+      + disabled                            = false
+      + display_name                        = (known after apply)
+      + email                               = "john.smith@regeneron-demo.com"
+      + fully_qualified_name                = (known after apply)
+      + has_rsa_public_key                  = (known after apply)
+      + id                                  = (known after apply)
+      + login_name                          = "jsmith"
+      + must_change_password                = true
+      + name                                = "JOHN_SMITH"
+      + show_output                         = (known after apply)
+    }
+
+  # module.users.snowflake_user.this["SARAH_CHEN"] will be created
+  + resource "snowflake_user" "this" {
+      + comment                             = "Senior data scientist – R&D"
+      + default_namespace                   = (known after apply)
+      + default_role                        = "DATA_SCIENTIST"
+      + default_warehouse                   = "DATA_SCIENCE_WH"
+      + disabled                            = false
+      + display_name                        = (known after apply)
+      + email                               = "sarah.chen@regeneron-demo.com"
+      + fully_qualified_name                = (known after apply)
+      + has_rsa_public_key                  = (known after apply)
+      + id                                  = (known after apply)
+      + login_name                          = "schen"
+      + must_change_password                = true
+      + name                                = "SARAH_CHEN"
+      + show_output                         = (known after apply)
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.warehouse["DATA_ANALYST_ANALYTICS_WH"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "warehouse" {
+      + account_role_name   = "DATA_ANALYST"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_account_object {
+          + object_name = "ANALYTICS_WH"
+          + object_type = "WAREHOUSE"
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.warehouse["DATA_ANALYST_REPORTING_WH"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "warehouse" {
+      + account_role_name   = "DATA_ANALYST"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_account_object {
+          + object_name = "REPORTING_WH"
+          + object_type = "WAREHOUSE"
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.warehouse["DATA_ENGINEER_ETL_WH"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "warehouse" {
+      + account_role_name   = "DATA_ENGINEER"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "MONITOR",
+          + "OPERATE",
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_account_object {
+          + object_name = "ETL_WH"
+          + object_type = "WAREHOUSE"
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.warehouse["DATA_SCIENTIST_ANALYTICS_WH"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "warehouse" {
+      + account_role_name   = "DATA_SCIENTIST"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_account_object {
+          + object_name = "ANALYTICS_WH"
+          + object_type = "WAREHOUSE"
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.warehouse["DATA_SCIENTIST_DATA_SCIENCE_WH"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "warehouse" {
+      + account_role_name   = "DATA_SCIENTIST"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "MONITOR",
+          + "OPERATE",
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_account_object {
+          + object_name = "DATA_SCIENCE_WH"
+          + object_type = "WAREHOUSE"
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.warehouse["ETL_SERVICE_ROLE_ETL_WH"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "warehouse" {
+      + account_role_name   = "ETL_SERVICE_ROLE"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "OPERATE",
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_account_object {
+          + object_name = "ETL_WH"
+          + object_type = "WAREHOUSE"
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.database["DATA_ANALYST_ANALYTICS_DB"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "database" {
+      + account_role_name   = "DATA_ANALYST"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_account_object {
+          + object_name = "ANALYTICS_DB"
+          + object_type = "DATABASE"
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.database["DATA_ENGINEER_ANALYTICS_DB"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "database" {
+      + account_role_name   = "DATA_ENGINEER"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "CREATE SCHEMA",
+          + "MONITOR",
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_account_object {
+          + object_name = "ANALYTICS_DB"
+          + object_type = "DATABASE"
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.database["DATA_ENGINEER_RAW_DB"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "database" {
+      + account_role_name   = "DATA_ENGINEER"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "CREATE SCHEMA",
+          + "MONITOR",
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_account_object {
+          + object_name = "RAW_DB"
+          + object_type = "DATABASE"
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.database["DATA_SCIENTIST_ANALYTICS_DB"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "database" {
+      + account_role_name   = "DATA_SCIENTIST"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_account_object {
+          + object_name = "ANALYTICS_DB"
+          + object_type = "DATABASE"
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.database["DATA_SCIENTIST_DATA_SCIENCE_DB"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "database" {
+      + account_role_name   = "DATA_SCIENTIST"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "CREATE SCHEMA",
+          + "MONITOR",
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_account_object {
+          + object_name = "DATA_SCIENCE_DB"
+          + object_type = "DATABASE"
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.database["ETL_SERVICE_ROLE_ANALYTICS_DB"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "database" {
+      + account_role_name   = "ETL_SERVICE_ROLE"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_account_object {
+          + object_name = "ANALYTICS_DB"
+          + object_type = "DATABASE"
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.database["ETL_SERVICE_ROLE_RAW_DB"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "database" {
+      + account_role_name   = "ETL_SERVICE_ROLE"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_account_object {
+          + object_name = "RAW_DB"
+          + object_type = "DATABASE"
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.schema["DATA_ANALYST_ANALYTICS_DB_AGGREGATES"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "schema" {
+      + account_role_name   = "DATA_ANALYST"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_schema {
+          + schema_name = "\"ANALYTICS_DB\".\"AGGREGATES\""
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.schema["DATA_ANALYST_ANALYTICS_DB_MARTS"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "schema" {
+      + account_role_name   = "DATA_ANALYST"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_schema {
+          + schema_name = "\"ANALYTICS_DB\".\"MARTS\""
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.schema["DATA_SCIENTIST_DATA_SCIENCE_DB_EXPERIMENTS"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "schema" {
+      + account_role_name   = "DATA_SCIENTIST"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "CREATE TABLE",
+          + "CREATE VIEW",
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_schema {
+          + schema_name = "\"DATA_SCIENCE_DB\".\"EXPERIMENTS\""
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.schema["DATA_SCIENTIST_DATA_SCIENCE_DB_FEATURES"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "schema" {
+      + account_role_name   = "DATA_SCIENTIST"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "CREATE TABLE",
+          + "CREATE VIEW",
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_schema {
+          + schema_name = "\"DATA_SCIENCE_DB\".\"FEATURES\""
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.schema["ETL_SERVICE_ROLE_ANALYTICS_DB_STAGING"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "schema" {
+      + account_role_name   = "ETL_SERVICE_ROLE"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "CREATE TABLE",
+          + "CREATE VIEW",
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_schema {
+          + schema_name = "\"ANALYTICS_DB\".\"STAGING\""
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.schema["ETL_SERVICE_ROLE_RAW_DB_KAFKA"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "schema" {
+      + account_role_name   = "ETL_SERVICE_ROLE"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "CREATE TABLE",
+          + "CREATE VIEW",
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_schema {
+          + schema_name = "\"RAW_DB\".\"KAFKA\""
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.schema["ETL_SERVICE_ROLE_RAW_DB_SALESFORCE"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "schema" {
+      + account_role_name   = "ETL_SERVICE_ROLE"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "CREATE TABLE",
+          + "CREATE VIEW",
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_schema {
+          + schema_name = "\"RAW_DB\".\"SALESFORCE\""
+        }
+    }
+
+  # module.grants.snowflake_grant_privileges_to_account_role.schema["ETL_SERVICE_ROLE_RAW_DB_SAP"] will be created
+  + resource "snowflake_grant_privileges_to_account_role" "schema" {
+      + account_role_name   = "ETL_SERVICE_ROLE"
+      + all_privileges      = false
+      + always_apply        = false
+      + id                  = (known after apply)
+      + on_account          = false
+      + privileges          = [
+          + "CREATE TABLE",
+          + "CREATE VIEW",
+          + "USAGE",
+        ]
+      + with_grant_option   = false
+
+      + on_schema {
+          + schema_name = "\"RAW_DB\".\"SAP\""
+        }
+    }
+
+  # module.grants.snowflake_grant_account_role.hierarchy["DATA_ANALYST_SYSADMIN"] will be created
+  + resource "snowflake_grant_account_role" "hierarchy" {
+      + id               = (known after apply)
+      + parent_role_name = "SYSADMIN"
+      + role_name        = "DATA_ANALYST"
+    }
+
+  # module.grants.snowflake_grant_account_role.hierarchy["DATA_ENGINEER_SYSADMIN"] will be created
+  + resource "snowflake_grant_account_role" "hierarchy" {
+      + id               = (known after apply)
+      + parent_role_name = "SYSADMIN"
+      + role_name        = "DATA_ENGINEER"
+    }
+
+  # module.grants.snowflake_grant_account_role.hierarchy["DATA_SCIENTIST_SYSADMIN"] will be created
+  + resource "snowflake_grant_account_role" "hierarchy" {
+      + id               = (known after apply)
+      + parent_role_name = "SYSADMIN"
+      + role_name        = "DATA_SCIENTIST"
+    }
+
+  # module.grants.snowflake_grant_account_role.hierarchy["ETL_SERVICE_ROLE_DATA_ENGINEER"] will be created
+  + resource "snowflake_grant_account_role" "hierarchy" {
+      + id               = (known after apply)
+      + parent_role_name = "DATA_ENGINEER"
+      + role_name        = "ETL_SERVICE_ROLE"
+    }
+
+Plan: 47 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + database_names = [
+      + "ANALYTICS_DB",
+      + "DATA_SCIENCE_DB",
+      + "RAW_DB",
+    ]
+  + role_names     = [
+      + "DATA_ANALYST",
+      + "DATA_ENGINEER",
+      + "DATA_SCIENTIST",
+      + "ETL_SERVICE_ROLE",
+    ]
+  + schema_names   = [
+      + "ANALYTICS_DB.AGGREGATES",
+      + "ANALYTICS_DB.MARTS",
+      + "ANALYTICS_DB.STAGING",
+      + "DATA_SCIENCE_DB.EXPERIMENTS",
+      + "DATA_SCIENCE_DB.FEATURES",
+      + "RAW_DB.KAFKA",
+      + "RAW_DB.SALESFORCE",
+      + "RAW_DB.SAP",
+    ]
+  + user_names     = [
+      + "ETL_SERVICE_USER",
+      + "JOHN_SMITH",
+      + "SARAH_CHEN",
+    ]
+  + warehouse_names = [
+      + "ANALYTICS_WH",
+      + "DATA_SCIENCE_WH",
+      + "ETL_WH",
+      + "REPORTING_WH",
+    ]
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"

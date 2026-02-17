@@ -1,0 +1,241 @@
+pipeline {
+    agent { label 'terraform' }
+
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        timeout(time: 60, unit: 'MINUTES')
+    }
+
+    environment {
+        SNOWFLAKE_ACCOUNT = "your-account"
+        SNOWFLAKE_ROLE    = "TERRAFORM_DEPLOY_ROLE"
+        TF_IN_AUTOMATION  = "true"
+        SLACK_CHANNEL     = "#devops-alerts"
+        TF_VERSION        = "1.6.6"
+        TF_WORKING_DIR    = "terraform"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git branch: "${env.BRANCH_NAME}",
+                    url: 'https://bitbucket.org/your-repo.git'
+            }
+        }
+
+        stage('Branch Validation') {
+            steps {
+                script {
+                    if (!(env.BRANCH_NAME in ['prod', 'qa', 'stage'])) {
+                        error("Pipeline aborted. Invalid branch: ${env.BRANCH_NAME}")
+                    }
+
+                    def tfvarsFile = "${TF_WORKING_DIR}/environments/${env.BRANCH_NAME}.tfvars"
+                    if (!fileExists(tfvarsFile)) {
+                        error("Environment tfvars file not found: ${tfvarsFile}")
+                    }
+                    echo "Using environment config: ${tfvarsFile}"
+                }
+            }
+        }
+
+        stage('Install Terraform') {
+            steps {
+                sh """
+                if ! command -v terraform &> /dev/null || [ "\$(terraform -version -json | jq -r '.terraform_version')" != "${TF_VERSION}" ]; then
+                    wget -q https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
+                    wget -q https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_SHA256SUMS
+                    grep "terraform_${TF_VERSION}_linux_amd64.zip" terraform_${TF_VERSION}_SHA256SUMS | sha256sum -c -
+                    unzip -o terraform_${TF_VERSION}_linux_amd64.zip
+                    sudo mv terraform /usr/local/bin/
+                    rm -f terraform_${TF_VERSION}_linux_amd64.zip terraform_${TF_VERSION}_SHA256SUMS
+                fi
+                terraform -version
+                """
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                dir("${TF_WORKING_DIR}") {
+                    withCredentials([string(credentialsId: 'snowflake-token', variable: 'SNOWFLAKE_TOKEN')]) {
+                        sh """
+                        terraform init \\
+                            -input=false \\
+                            -backend-config="environment=${env.BRANCH_NAME}"
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Terraform Validate') {
+            steps {
+                dir("${TF_WORKING_DIR}") {
+                    sh 'terraform validate'
+                }
+            }
+        }
+
+        stage('Terraform Format Check') {
+            steps {
+                dir("${TF_WORKING_DIR}") {
+                    sh 'terraform fmt -check -recursive -diff'
+                }
+            }
+        }
+
+        stage('TerraScan') {
+            steps {
+                dir("${TF_WORKING_DIR}") {
+                    script {
+                        def scanExitCode = sh(script: 'terrascan scan -t terraform -o yaml > terrascan-results.yaml', returnStatus: true)
+                        if (scanExitCode != 0) {
+                            echo "TerraScan found violations. Review terrascan-results.yaml for details."
+                            unstable("TerraScan violations detected")
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                dir("${TF_WORKING_DIR}") {
+                    withCredentials([string(credentialsId: 'snowflake-token', variable: 'SNOWFLAKE_TOKEN')]) {
+                        sh """
+                        terraform plan \\
+                            -var-file="environments/${env.BRANCH_NAME}.tfvars" \\
+                            -input=false \\
+                            -out=tfplan
+                        terraform show -no-color tfplan > tfplan.txt
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Manual Approval') {
+            when {
+                anyOf {
+                    branch 'qa'
+                    branch 'stage'
+                    branch 'prod'
+                }
+            }
+            steps {
+                timeout(time: 30, unit: 'MINUTES') {
+                    input message: "Approve Terraform Apply for ${env.BRANCH_NAME}?",
+                          submitter: 'devops-approvers'
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                dir("${TF_WORKING_DIR}") {
+                    withCredentials([string(credentialsId: 'snowflake-token', variable: 'SNOWFLAKE_TOKEN')]) {
+                        sh 'terraform apply -input=false tfplan'
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+
+        success {
+            script {
+                def commitHash = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                writeFile file: 'last_successful_commit.txt', text: commitHash
+            }
+
+            slackSend channel: "${SLACK_CHANNEL}",
+                      color: 'good',
+                      message: """\
+                      ✅ Build SUCCESS
+                      Project: ${env.JOB_NAME}
+                      Branch: ${env.BRANCH_NAME}
+                      Build: #${env.BUILD_NUMBER}
+                      URL: ${env.BUILD_URL}
+                      """
+        }
+
+        failure {
+            slackSend channel: "${SLACK_CHANNEL}",
+                      color: 'danger',
+                      message: """\
+                      ❌ Build FAILED
+                      Project: ${env.JOB_NAME}
+                      Branch: ${env.BRANCH_NAME}
+                      Build: #${env.BUILD_NUMBER}
+                      URL: ${env.BUILD_URL}
+                      """
+
+            script {
+                def prevSuccessfulBuild = currentBuild.previousSuccessfulBuild
+
+                if (prevSuccessfulBuild != null) {
+                    try {
+                        copyArtifacts(
+                            projectName: env.JOB_NAME,
+                            selector: specific("${prevSuccessfulBuild.number}"),
+                            filter: 'last_successful_commit.txt'
+                        )
+
+                        def prevCommit = readFile('last_successful_commit.txt').trim()
+                        echo "Rolling back to last stable commit: ${prevCommit}"
+
+                        dir("${TF_WORKING_DIR}") {
+                            withCredentials([string(credentialsId: 'snowflake-token', variable: 'SNOWFLAKE_TOKEN')]) {
+                                sh """
+                                git checkout ${prevCommit}
+                                terraform init -input=false -backend-config="environment=${env.BRANCH_NAME}"
+                                terraform plan -var-file="environments/${env.BRANCH_NAME}.tfvars" -input=false -out=rollback.tfplan
+                                terraform apply -input=false rollback.tfplan
+                                """
+                            }
+                        }
+
+                        echo "Rollback completed successfully."
+
+                        slackSend channel: "${SLACK_CHANNEL}",
+                                  color: 'warning',
+                                  message: """\
+                                  🔄 Rollback SUCCEEDED
+                                  Project: ${env.JOB_NAME}
+                                  Branch: ${env.BRANCH_NAME}
+                                  Rolled back to: ${prevCommit}
+                                  """
+
+                    } catch (rollbackError) {
+                        echo "Rollback failed: ${rollbackError.getMessage()}. Manual intervention required."
+
+                        slackSend channel: "${SLACK_CHANNEL}",
+                                  color: 'danger',
+                                  message: """\
+                                  🚨 Rollback FAILED — Manual intervention required!
+                                  Project: ${env.JOB_NAME}
+                                  Branch: ${env.BRANCH_NAME}
+                                  Error: ${rollbackError.getMessage()}
+                                  """
+                    }
+                } else {
+                    echo "No previous successful build found. Manual rollback required."
+                }
+            }
+        }
+
+        always {
+            archiveArtifacts artifacts: "${TF_WORKING_DIR}/tfplan.txt, ${TF_WORKING_DIR}/terrascan-results.yaml, last_successful_commit.txt",
+                             allowEmptyArchive: true,
+                             fingerprint: true
+
+            echo 'Pipeline execution completed.'
+            cleanWs()
+        }
+    }
+}
