@@ -12,4 +12,8 @@ resource "snowflake_user" "this" {
   default_role         = each.value.default_role
   must_change_password = each.value.must_change_password
   comment              = each.value.comment
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }

@@ -8,6 +8,10 @@ resource "snowflake_database" "this" {
   name                        = each.value.name
   comment                     = each.value.comment
   data_retention_time_in_days = each.value.data_retention_time_in_days
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 ###############################################################################
@@ -41,6 +45,10 @@ resource "snowflake_schema" "this" {
   database = each.value.database_name
   name     = each.value.schema_name
   comment  = each.value.comment
+
+  lifecycle {
+    prevent_destroy = true
+  }
 
   depends_on = [snowflake_database.this]
 }

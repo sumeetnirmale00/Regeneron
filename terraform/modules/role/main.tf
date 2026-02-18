@@ -7,4 +7,8 @@ resource "snowflake_account_role" "this" {
 
   name    = each.value.name
   comment = each.value.comment
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }

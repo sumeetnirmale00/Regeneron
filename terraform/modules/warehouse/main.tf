@@ -12,4 +12,8 @@ resource "snowflake_warehouse" "this" {
   min_cluster_count = each.value.min_cluster_count
   max_cluster_count = each.value.max_cluster_count
   comment           = each.value.comment
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
