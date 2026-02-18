@@ -1,12 +1,12 @@
-environment = "prod"
+environment = "dev"
 
 # =============================================================================
-# Databases - REGN_GD_DB_PROD
+# Databases - REGN_GD_DB_DEV
 # =============================================================================
 databases = [
   {
-    name                        = "REGN_GD_DB_PROD"
-    comment                     = "Database for environment PROD"
+    name                        = "REGN_GD_DB_DEV"
+    comment                     = "Database for environment DEV"
     data_retention_time_in_days = 90
     schemas = [
       { name = "REGN_GD_SCH_RAW",  comment = "Schema for Raw data" },
@@ -19,35 +19,35 @@ databases = [
 ]
 
 # =============================================================================
-# Warehouses - REGN_GD_WH_PROD_<PURPOSE>
+# Warehouses - REGN_GD_WH_DEV_<PURPOSE>
 # =============================================================================
 warehouses = [
   {
-    name              = "REGN_GD_WH_PROD_ETL"
-    size              = "MEDIUM"
+    name              = "REGN_GD_WH_DEV_ETL"
+    size              = "X-SMALL"
     auto_suspend      = 120
     auto_resume       = true
     min_cluster_count = 1
-    max_cluster_count = 3
-    comment           = "Warehouse for environment PROD with purpose for ETL jobs"
+    max_cluster_count = 1
+    comment           = "Warehouse for environment DEV with purpose for ETL jobs"
   },
   {
-    name              = "REGN_GD_WH_PROD_USR"
-    size              = "LARGE"
+    name              = "REGN_GD_WH_DEV_USR"
+    size              = "X-SMALL"
     auto_suspend      = 300
     auto_resume       = true
     min_cluster_count = 1
-    max_cluster_count = 4
-    comment           = "Warehouse for environment PROD with purpose for Data management users and analytics users"
+    max_cluster_count = 1
+    comment           = "Warehouse for environment DEV with purpose for Data management users and analytics users"
   },
   {
-    name              = "REGN_GD_WH_PROD_REPORTING"
-    size              = "SMALL"
+    name              = "REGN_GD_WH_DEV_REPORTING"
+    size              = "X-SMALL"
     auto_suspend      = 60
     auto_resume       = true
     min_cluster_count = 1
-    max_cluster_count = 2
-    comment           = "Warehouse for environment PROD with purpose for Reporting and other Tools"
+    max_cluster_count = 1
+    comment           = "Warehouse for environment DEV with purpose for Reporting and other Tools"
   },
 ]
 

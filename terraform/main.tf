@@ -59,6 +59,16 @@ module "users" {
 }
 
 # -----------------------------------------------------------------------------
+# Network Policies
+# -----------------------------------------------------------------------------
+
+module "network_policies" {
+  source = "./modules/network_policy"
+
+  network_policies = var.network_policies
+}
+
+# -----------------------------------------------------------------------------
 # Grants
 # -----------------------------------------------------------------------------
 # The grants module receives all grant definitions and manages them centrally
@@ -78,5 +88,6 @@ module "grants" {
     module.databases,
     module.roles,
     module.users,
+    module.network_policies,
   ]
 }
